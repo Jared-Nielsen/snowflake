@@ -1,0 +1,39 @@
+8.0 Non-Functional, Security, Governance, TCO, Change Management, PoV, Monitoring, Vendor, and Post-Go-Live Requirements8.1 Non-Functional RequirementsLatency SLAs: Real-time alerts and recommendations delivered in < 30 seconds (end-to-end from source system event to operator dashboard). Snowpipe continuous ingest + Cortex AI inference + zero-copy shares achieve sub-5-second typical latency for high-priority use cases (e.g., margin optimization, anomaly detection).  
+Scalability: Designed to ingest and process 500,000+ sensors/day (high-frequency time-series from Cognite) with automatic compute scaling. Snowflake multi-cluster warehouses and Snowpark auto-scaling handle refinery peaks without manual intervention.  
+Uptime / Availability: 99.99% SLA guaranteed by Snowflake (industry-leading for cloud data platforms). Multi-AZ and multi-cloud deployment options ensure business continuity.
+
+8.2 Security & ComplianceRBAC & Fine-Grained Access: Role-based access control with dynamic data masking, row-level security, and column-level policies (e.g., traders see only aggregated positions; plant operators see only their unit’s sensor data).  
+Encryption: Data encrypted at rest (AES-256) and in transit (TLS 1.3). PrivateLink for zero-copy shares with Cognite and SAP eliminates public internet exposure.  
+Compliance: SOC 2 Type II, ISO 27001, HIPAA-equivalent controls, and energy-sector regulatory alignment (e.g., CMMC Level 2 readiness). Full audit logging via Horizon Catalog.  
+Data Residency: Flexible multi-cloud deployment (AWS, Azure, GCP) with customer-controlled region selection to meet U.S. Gulf Coast data-sovereignty needs.
+
+8.3 Data Quality & Governance FrameworkDQ Rules: Automated data quality checks (completeness, freshness, accuracy) executed via Snowflake Tasks on Bronze → Silver layers. Example rules: “Cognite time-series freshness < 60 seconds”, “Quorum volume variance < 0.5% vs. Sirion contract”.  
+Horizon Catalog Policies: Centralized catalog with business glossary, lineage tracking (end-to-end from source to Cortex model), and automated classification of sensitive data (PII, financials, OT). Data products are published as governed shares for internal and external (trader/supplier) consumption.
+
+8.4 Detailed TCO Model & Zero-Copy SavingsBaseline Assumptions (200–300 kbpd refinery): ~500k sensors/day, 2–5 TB/month new data, moderate AI/ML workload.  
+Snowflake TCO (Year 1): $180k–$320k (compute + storage).  
+Zero-Copy Savings: Cognite and SAP data incur zero storage cost in your Snowflake account (only compute when queried). Estimated annual savings: $250k–$450k vs. traditional ETL/duplication approaches.  
+Net 3-Year TCO Advantage: 40–60% lower than on-prem or competing lakehouse platforms due to pay-per-second compute, auto-suspend, and zero-copy architecture.
+
+8.5 Change Management & Training PlanPhase 1 (PoV): 4-hour operator/analyst workshop + hands-on Cortex Analyst training.  
+Phase 2 (Go-Live): Role-based training tracks (Analysts: SQL/Snowpark; Operators: natural-language Cortex Analyst; Data Scientists: full ML lifecycle).  
+Adoption Support: Quarterly “AI Champion” program, pre-built dashboards, and embedded voice explainers in the React UI for self-service learning. Target: 80% user adoption within 90 days.
+
+8.6 PoV Success Criteria and Resource PlanSuccess Criteria (4–6 week PoV):  Deliver at least one live toolkit (e.g., crude blending or pump predictive maintenance) with measurable ROI signal.  
+Demonstrate < 30s latency and zero-copy Cognite/SAP integration.  
+Achieve 95%+ data-quality score and positive user feedback.
+
+Resource Plan: Snowflake team provides 1 Sales Architect + 1 Solutions Engineer (20 hours/week). Texas Refining provides 1 data lead + 1 operations sponsor (10 hours/week). Budget: modest consumption credits for PoV environment.
+
+8.7 Monitoring & Model-Drift ObservabilityBuilt-in Tools: Snowflake Query Profile, Resource Monitors, and Cortex Model Monitoring.  
+Model-Drift Detection: Automated Snowpark jobs compare live predictions vs. actual outcomes (e.g., predicted vs. actual yield). Alerts via email/Slack when drift > 5%.  
+Observability Dashboard: Unified view of pipeline health, latency, and data freshness.
+
+8.8 Vendor Contract Addendums for Cognite/SAP Data-SharingZero-Copy Addendums: Standard Snowflake Secure Share agreements with Cognite and SAP Business Data Cloud (already in place via 2025–2026 partnerships). Includes bidirectional sharing clauses, data-ownership retention, and audit rights.  
+Recommended Language: “Customer retains full ownership of shared data; Snowflake acts only as compute layer.”
+
+8.9 Post-Go-Live Support & Quarterly AI Retraining ProcessSupport: 24×7 Snowflake Premier Support + dedicated Customer Success Manager.  
+Quarterly AI Retraining: Automated Snowpark pipelines retrain Cortex/Snowpark models using latest 90-day data. Governance review ensures no unintended bias or drift.
+
+8.10 Integration Testing with Your Exact Data VolumesApproach: During PoV, we ingest anonymized subsets of your real data volumes (sensor streams, trade files, etc.) into the trial account. Full end-to-end testing validates latency, scalability, and accuracy against your production-like loads.
+

@@ -1,0 +1,213 @@
+@import url('@xyflow/react/dist/style.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-base: 8 14 24;
+    --bg-panel: 13 22 36;
+    --bg-elev: 19 32 51;
+    --edge-subtle: 30 48 73;
+    --edge-strong: 56 76 105;
+    --ink: 226 232 240;
+    --ink-dim: 148 163 184;
+    --ink-muted: 100 116 139;
+    --snow: 30 167 255;
+    --cyan: 78 226 244;
+    --amber: 255 182 39;
+    --signal: 52 213 123;
+    --alarm: 239 68 68;
+    --copper: 199 154 74;
+    --flare: 255 107 53;
+  }
+
+  html, body, #root {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    @apply bg-bg-base text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(1400px 900px at 80% -10%, rgba(30, 167, 255, 0.08), transparent 60%),
+      radial-gradient(900px 700px at -10% 110%, rgba(255, 107, 53, 0.06), transparent 60%);
+    background-attachment: fixed;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Atmospheric grain — fractal noise via inline SVG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    opacity: 0.04;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  /* Engineering grid — fine reticle */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(56, 76, 105, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56, 76, 105, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    z-index: 0;
+  }
+
+  ::selection {
+    background: rgb(var(--snow) / 0.3);
+    color: rgb(var(--ink));
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: rgb(var(--bg-base)); }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--edge-subtle));
+    border: 2px solid rgb(var(--bg-base));
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--edge-strong)); }
+
+  /* KaTeX color override for our dark theme */
+  .katex { color: rgb(var(--ink-dim)); }
+  .katex .mord, .katex .mbin, .katex .mrel, .katex .mopen, .katex .mclose,
+  .katex .mpunct, .katex .minner, .katex .mop, .katex .mfrac > span,
+  .katex .accent, .katex .vlist-t, .katex .vlist-r, .katex .vlist {
+    color: inherit;
+  }
+}
+
+@layer components {
+  /* Engineering typography tokens */
+  .tag {
+    @apply font-mono text-[10px] uppercase tracking-[0.18em] text-ink-muted;
+  }
+  .tag-strong {
+    @apply font-cond text-[11px] uppercase tracking-[0.16em] font-semibold text-ink-dim;
+  }
+
+  /* Schematic panels with corner ticks */
+  .panel {
+    @apply bg-bg-panel/80 backdrop-blur-sm border border-edge-subtle relative;
+  }
+  .panel-elev {
+    @apply bg-bg-elev/80 border border-edge-strong relative;
+  }
+  .corner {
+    @apply absolute w-2 h-2 pointer-events-none;
+    border-color: rgb(var(--cyan));
+  }
+  .corner-tl { @apply top-0 left-0; border-top-width: 1px; border-left-width: 1px; }
+  .corner-tr { @apply top-0 right-0; border-top-width: 1px; border-right-width: 1px; }
+  .corner-bl { @apply bottom-0 left-0; border-bottom-width: 1px; border-left-width: 1px; }
+  .corner-br { @apply bottom-0 right-0; border-bottom-width: 1px; border-right-width: 1px; }
+
+  /* LCD-style numerics */
+  .lcd {
+    @apply font-mono tabular-nums text-amber;
+    text-shadow: 0 0 14px rgba(255, 182, 39, 0.4);
+  }
+  .lcd-green {
+    @apply font-mono tabular-nums text-signal;
+    text-shadow: 0 0 14px rgba(52, 213, 123, 0.4);
+  }
+  .lcd-blue {
+    @apply font-mono tabular-nums text-cyan;
+    text-shadow: 0 0 14px rgba(78, 226, 244, 0.4);
+  }
+  .lcd-red {
+    @apply font-mono tabular-nums text-alarm;
+    text-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+  }
+
+  /* Status LEDs */
+  .led {
+    @apply inline-block w-1.5 h-1.5 rounded-full shrink-0;
+  }
+  .led-green { background: rgb(var(--signal)); box-shadow: 0 0 8px rgba(52, 213, 123, 0.7); }
+  .led-amber { background: rgb(var(--amber)); box-shadow: 0 0 8px rgba(255, 182, 39, 0.7); }
+  .led-red { background: rgb(var(--alarm)); box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+  .led-cyan { background: rgb(var(--cyan)); box-shadow: 0 0 8px rgba(78, 226, 244, 0.7); }
+  .led-off { background: rgb(var(--edge-strong)); }
+}
+
+/* React Flow overrides — dark control-room palette */
+.react-flow {
+  background: transparent !important;
+}
+.react-flow__renderer {
+  background: transparent;
+}
+.react-flow__node {
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
+  border-radius: 0 !important;
+}
+.react-flow__edge-path {
+  stroke: rgb(var(--edge-strong));
+  stroke-width: 1.5;
+}
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke: rgb(var(--cyan));
+  stroke-dasharray: 6 4;
+  filter: drop-shadow(0 0 4px rgba(78, 226, 244, 0.45));
+}
+.react-flow__edge-textbg {
+  fill: rgb(var(--bg-panel));
+}
+.react-flow__edge-text {
+  fill: rgb(var(--ink-dim));
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+}
+.react-flow__handle {
+  background: rgb(var(--edge-strong)) !important;
+  border: 1px solid rgb(var(--bg-base)) !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 0 !important;
+}
+.react-flow__handle.source {
+  background: rgb(var(--cyan)) !important;
+  box-shadow: 0 0 6px rgba(78, 226, 244, 0.6);
+}
+.react-flow__handle.target {
+  background: rgb(var(--amber)) !important;
+}
+.react-flow__controls {
+  background: rgb(var(--bg-panel)) !important;
+  border: 1px solid rgb(var(--edge-subtle)) !important;
+  box-shadow: none !important;
+}
+.react-flow__controls-button {
+  background: rgb(var(--bg-panel)) !important;
+  border-bottom: 1px solid rgb(var(--edge-subtle)) !important;
+  color: rgb(var(--ink-dim)) !important;
+  fill: rgb(var(--ink-dim)) !important;
+}
+.react-flow__controls-button:hover {
+  background: rgb(var(--bg-elev)) !important;
+  color: rgb(var(--cyan)) !important;
+  fill: rgb(var(--cyan)) !important;
+}
+.react-flow__attribution {
+  display: none !important;
+}
+.react-flow__minimap {
+  background: rgb(var(--bg-panel)) !important;
+  border: 1px solid rgb(var(--edge-subtle)) !important;
+}
+
+/* Stagger reveal helper */
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 180ms; }
+.stagger-4 { animation-delay: 240ms; }
+.stagger-5 { animation-delay: 300ms; }
+.stagger-6 { animation-delay: 360ms; }
