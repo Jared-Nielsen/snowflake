@@ -19,10 +19,11 @@
  *      Devices tab focused on the selected device.
  */
 
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import type { Node, Edge } from '@xyflow/react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, Text } from '@react-three/drei'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 import { Panel, PanelHeader, Kpi } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -205,8 +206,11 @@ function RefineryPanorama() {
     })
   }, [])
 
+  const controlsRef = useRef<OrbitControlsImpl | null>(null)
+
   return (
-    <Canvas camera={{ position: [8, 9, 22], fov: 38 }} dpr={[1, 1.6]}>
+    // Start the camera *far* — the CameraDolly will ease it in to the framed view.
+    <Canvas camera={{ position: [60, 48, 100], fov: 38 }} dpr={[1, 1.6]}>
       <color attach="background" args={['#080e18']} />
       <fog attach="fog" args={['#080e18', 24, 90]} />
       <ambientLight intensity={1.2} />
@@ -236,17 +240,73 @@ function RefineryPanorama() {
         return <DeviceMarker key={d.id} device={d} x={p.x} y={p.y} z={p.z} />
       })}
 
+      {/* Cinematic intro dolly — eases the camera from far to framed view */}
+      <CameraDolly
+        target={[8, 9, 22]}
+        durationMs={2400}
+        controlsRef={controlsRef}
+      />
+
       <OrbitControls
+        ref={controlsRef}
         enablePan
         screenSpacePanning
         minDistance={5}
-        maxDistance={80}
+        maxDistance={120}
         minPolarAngle={0.05}
         maxPolarAngle={Math.PI - 0.05}
         target={[0, 0, 0]}
       />
     </Canvas>
   )
+}
+
+/**
+ * CameraDolly — animates the active camera from its initial position to
+ * `target` over `durationMs` using easeOutCubic. While the animation is
+ * running, OrbitControls user input is suppressed (controlsRef.enabled =
+ * false); once complete, controls are re-enabled so the user can orbit
+ * naturally.
+ */
+function CameraDolly({
+  target,
+  durationMs,
+  controlsRef,
+}: {
+  target: [number, number, number]
+  durationMs: number
+  controlsRef: React.MutableRefObject<OrbitControlsImpl | null>
+}) {
+  const { camera } = useThree()
+  const startRef = useRef<{ t0: number; from: [number, number, number] } | null>(null)
+  const doneRef = useRef(false)
+
+  useFrame(() => {
+    if (doneRef.current) return
+    const now = performance.now()
+    if (!startRef.current) {
+      startRef.current = { t0: now, from: [camera.position.x, camera.position.y, camera.position.z] }
+      if (controlsRef.current) controlsRef.current.enabled = false
+    }
+    const { t0, from } = startRef.current
+    const t = Math.min(1, (now - t0) / durationMs)
+    // easeOutCubic
+    const e = 1 - Math.pow(1 - t, 3)
+    camera.position.set(
+      from[0] + (target[0] - from[0]) * e,
+      from[1] + (target[1] - from[1]) * e,
+      from[2] + (target[2] - from[2]) * e,
+    )
+    camera.lookAt(0, 0, 0)
+    if (t >= 1) {
+      doneRef.current = true
+      if (controlsRef.current) {
+        controlsRef.current.enabled = true
+        controlsRef.current.update()
+      }
+    }
+  })
+  return null
 }
 
 function DeviceMarker({ device, x, y, z }: { device: TrainDevice; x: number; y: number; z: number }) {
@@ -442,14 +502,14 @@ export function RefineryTab() {
         <FlowInspector />
       </div>
 
-      {/* 3D panorama + inspector */}
+      {/* 3D panorama + inspector — height matches the workflow diagram row above */}
       <div className="grid grid-cols-[1fr_360px] gap-4 items-stretch">
-        <Panel className="flex flex-col">
+        <Panel className="flex flex-col min-h-[480px]">
           <PanelHeader label="3D PLANT PANORAMA · all 13 devices on one baseplate" hint="click any device · orbit · pan · zoom">
             <Badge tone="cyan">interactive</Badge>
             <Badge tone="copper">3D · R3F</Badge>
           </PanelHeader>
-          <div className="h-[520px] relative flex-1 min-h-0">
+          <div className="relative flex-1 min-h-[420px]">
             <RefineryPanorama />
             <div className="absolute top-3 left-3 panel-elev px-3 py-2">
               <div className="tag">CLICK · ORBIT · PAN · ZOOM</div>

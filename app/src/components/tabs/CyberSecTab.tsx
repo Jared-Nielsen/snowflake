@@ -476,6 +476,9 @@ export function CyberSecTab() {
         </Panel>
       </div>
 
+      {/* Scenario topology — lights up affected nodes as the scenario plays */}
+      <ScenarioTopology visible={visible} scenarioId={scenario.id} />
+
       {/* Detection sources */}
       <div className="grid grid-cols-3 gap-4">
         <Panel className="p-4">
@@ -541,5 +544,213 @@ function RiskMeter({ visible }: { visible: Event[] }) {
         <span>100</span>
       </div>
     </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SCENARIO TOPOLOGY — full-width LAN/WAN/Cloud diagram that lights up
+   affected nodes as the scenario plays.
+   ════════════════════════════════════════════════════════════════════ */
+
+interface ScNode { id: string; label: string; x: number; y: number; layer: string }
+interface ScEdge { from: string; to: string }
+
+const SC_W = 1340
+const SC_H = 280
+
+const SC_NODES: ScNode[] = [
+  /* Cloud / WAN */
+  { id: 'snowflake', label: 'Snowflake',         x: 110,  y: 60,  layer: 'L5 cloud' },
+  { id: 'mail',      label: 'O365 Mail',         x: 240,  y: 60,  layer: 'L5 cloud' },
+  { id: 'dns',       label: 'WAN DNS',           x: 370,  y: 60,  layer: 'L5 cloud' },
+  /* WAN edge */
+  { id: 'corp-rtr',  label: 'Corp Router',       x: 240,  y: 140, layer: 'L4 WAN' },
+  { id: 'fw-up',     label: 'IDMZ FW',           x: 380,  y: 140, layer: 'IDMZ' },
+  /* IDMZ */
+  { id: 'jump',      label: 'Jump Host',         x: 520,  y: 80,  layer: 'IDMZ' },
+  { id: 'hist-rep',  label: 'Historian Replica', x: 520,  y: 200, layer: 'IDMZ' },
+  /* L3 OT */
+  { id: 'fw-dn',     label: 'OT Edge FW',        x: 660,  y: 140, layer: 'L3 OT' },
+  { id: 'ot-dc',     label: 'OT-DC',             x: 800,  y: 80,  layer: 'L3 OT' },
+  { id: 'ews',       label: 'EWS',               x: 800,  y: 200, layer: 'L3 OT' },
+  /* L2 */
+  { id: 'l2-sw',     label: 'L2 Switch',         x: 940,  y: 140, layer: 'L2' },
+  { id: 'hmi1',      label: 'HMI-1',             x: 1080, y: 60,  layer: 'L2' },
+  { id: 'dcs-srv',   label: 'DCS Servers',       x: 1080, y: 140, layer: 'L2' },
+  { id: 'siem',      label: 'SIEM',              x: 1220, y: 60,  layer: 'L2 SOC' },
+  /* L1 */
+  { id: 'wifi',      label: 'Wi-Fi',             x: 1080, y: 220, layer: 'L1' },
+  { id: 'plc3',      label: 'PLC-3 Utilities',   x: 1220, y: 160, layer: 'L1' },
+  { id: 'plc1',      label: 'PLC-1 CDU',         x: 1220, y: 220, layer: 'L1' },
+  { id: 'sis',       label: 'SIS',               x: 1300, y: 140, layer: 'L1' },
+]
+
+const SC_EDGES: ScEdge[] = [
+  { from: 'snowflake', to: 'corp-rtr' },
+  { from: 'mail',      to: 'corp-rtr' },
+  { from: 'dns',       to: 'corp-rtr' },
+  { from: 'corp-rtr',  to: 'fw-up' },
+  { from: 'fw-up',     to: 'jump' },
+  { from: 'fw-up',     to: 'hist-rep' },
+  { from: 'fw-up',     to: 'fw-dn' },
+  { from: 'fw-dn',     to: 'ot-dc' },
+  { from: 'fw-dn',     to: 'ews' },
+  { from: 'fw-dn',     to: 'l2-sw' },
+  { from: 'l2-sw',     to: 'hmi1' },
+  { from: 'l2-sw',     to: 'dcs-srv' },
+  { from: 'l2-sw',     to: 'siem' },
+  { from: 'l2-sw',     to: 'wifi' },
+  { from: 'l2-sw',     to: 'plc3' },
+  { from: 'l2-sw',     to: 'plc1' },
+  { from: 'l2-sw',     to: 'sis' },
+]
+
+/**
+ * Scenario id → ordered chain of nodes that should light up in sequence as
+ * the simulator plays. Each entry maps a node id to the visible event
+ * count threshold that activates it.
+ */
+const SC_ACTIVATIONS: Record<string, { node: string; afterEvents: number }[]> = {
+  'port-scan':       [
+    { node: 'snowflake', afterEvents: 1 },
+    { node: 'corp-rtr', afterEvents: 1 },
+    { node: 'fw-up',     afterEvents: 2 },
+    { node: 'fw-dn',     afterEvents: 3 },
+  ],
+  'ransomware-hmi':  [
+    { node: 'hmi1',     afterEvents: 1 },
+    { node: 'l2-sw',    afterEvents: 3 },
+    { node: 'dcs-srv',  afterEvents: 4 },
+    { node: 'ot-dc',    afterEvents: 5 },
+    { node: 'siem',     afterEvents: 4 },
+  ],
+  'modbus-mitm':     [
+    { node: 'wifi',     afterEvents: 1 },
+    { node: 'l2-sw',    afterEvents: 2 },
+    { node: 'plc3',     afterEvents: 3 },
+    { node: 'sis',      afterEvents: 5 },
+    { node: 'siem',     afterEvents: 4 },
+  ],
+  'phishing-ews':    [
+    { node: 'mail',     afterEvents: 1 },
+    { node: 'ews',      afterEvents: 2 },
+    { node: 'dns',      afterEvents: 4 },
+    { node: 'fw-dn',    afterEvents: 5 },
+    { node: 'ot-dc',    afterEvents: 5 },
+  ],
+  'plc-ladder':      [
+    { node: 'ews',      afterEvents: 1 },
+    { node: 'l2-sw',    afterEvents: 2 },
+    { node: 'plc1',     afterEvents: 3 },
+    { node: 'sis',      afterEvents: 4 },
+    { node: 'siem',     afterEvents: 4 },
+  ],
+  'dns-exfil':       [
+    { node: 'hist-rep', afterEvents: 1 },
+    { node: 'dns',      afterEvents: 2 },
+    { node: 'fw-up',    afterEvents: 3 },
+    { node: 'snowflake', afterEvents: 4 },
+  ],
+}
+
+function ScenarioTopology({ visible, scenarioId }: { visible: Event[]; scenarioId: string }) {
+  const activations = SC_ACTIVATIONS[scenarioId] ?? []
+  const seen = visible.length
+
+  const active = useMemo(() => {
+    const s = new Set<string>()
+    for (const a of activations) {
+      if (seen >= a.afterEvents) s.add(a.node)
+    }
+    return s
+  }, [activations, seen])
+
+  // Edges between consecutively-activated nodes light up as the attack path
+  const activeEdges = useMemo(() => {
+    const set = new Set<string>()
+    const order = activations.filter((a) => seen >= a.afterEvents).map((a) => a.node)
+    for (let i = 0; i < order.length - 1; i++) {
+      // Find the edge connecting order[i] -> order[i+1] in either direction
+      const a = order[i], b = order[i + 1]
+      const e = SC_EDGES.find((edge) =>
+        (edge.from === a && edge.to === b) ||
+        (edge.from === b && edge.to === a),
+      )
+      if (e) set.add(`${e.from}>${e.to}`)
+    }
+    return set
+  }, [activations, seen])
+
+  return (
+    <Panel className="flex flex-col">
+      <PanelHeader label="ATTACK SURFACE · LIVE TOPOLOGY · NODES LIGHT UP AS SCENARIO PLAYS" hint="full-width">
+        <Badge tone="cyan">{active.size} active</Badge>
+        <Badge tone="flare">{activeEdges.size} hops</Badge>
+      </PanelHeader>
+      <div className="p-3">
+        <svg viewBox={`0 0 ${SC_W} ${SC_H}`} className="w-full bg-bg-base">
+          {/* layer bands */}
+          <rect x="0"   y="0"   width="160" height={SC_H} fill="#4ee2f4" opacity="0.04" />
+          <rect x="160" y="0"   width="320" height={SC_H} fill="#1ea7ff" opacity="0.04" />
+          <rect x="480" y="0"   width="160" height={SC_H} fill="#ef4444" opacity="0.05" />
+          <rect x="640" y="0"   width="240" height={SC_H} fill="#34d57b" opacity="0.04" />
+          <rect x="880" y="0"   width="460" height={SC_H} fill="#ffb627" opacity="0.04" />
+          <text x="10"   y="14" fontSize="9" fill="#4ee2f4" fontWeight="bold">CLOUD</text>
+          <text x="170"  y="14" fontSize="9" fill="#1ea7ff" fontWeight="bold">WAN / CORP</text>
+          <text x="490"  y="14" fontSize="9" fill="#ef4444" fontWeight="bold">IDMZ</text>
+          <text x="650"  y="14" fontSize="9" fill="#34d57b" fontWeight="bold">L3 OT</text>
+          <text x="890"  y="14" fontSize="9" fill="#ffb627" fontWeight="bold">L2 / L1 / SOC</text>
+
+          {/* Edges */}
+          {SC_EDGES.map((e, i) => {
+            const a = SC_NODES.find((n) => n.id === e.from)!
+            const b = SC_NODES.find((n) => n.id === e.to)!
+            const isActive = activeEdges.has(`${e.from}>${e.to}`)
+            return (
+              <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                    stroke={isActive ? '#ef4444' : '#3a4a64'}
+                    strokeWidth={isActive ? 2.4 : 1.0}
+                    strokeOpacity={isActive ? 0.95 : 0.45}
+                    style={isActive ? { filter: 'drop-shadow(0 0 5px #ef4444)' } : undefined } />
+            )
+          })}
+          {/* Animated pulse along active edges */}
+          {Array.from(activeEdges).map((eid) => {
+            const [from, to] = eid.split('>')
+            const a = SC_NODES.find((n) => n.id === from)!
+            const b = SC_NODES.find((n) => n.id === to)!
+            return (
+              <circle key={eid} r="3" fill="#ff6b35">
+                <animate attributeName="cx" values={`${a.x};${b.x}`} dur="1.4s" repeatCount="indefinite" />
+                <animate attributeName="cy" values={`${a.y};${b.y}`} dur="1.4s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0;1;0" dur="1.4s" repeatCount="indefinite" />
+              </circle>
+            )
+          })}
+          {/* Nodes */}
+          {SC_NODES.map((n) => {
+            const isActive = active.has(n.id)
+            return (
+              <g key={n.id} transform={`translate(${n.x},${n.y})`}>
+                {isActive && (
+                  <circle r="22" fill="#ef4444" opacity="0.18">
+                    <animate attributeName="r" values="14;26;14" dur="1.6s" repeatCount="indefinite" />
+                  </circle>
+                )}
+                <circle r="12"
+                        fill={isActive ? '#ef4444' : '#0b1322'}
+                        stroke={isActive ? '#ef4444' : '#586984'}
+                        strokeWidth={isActive ? 2.2 : 1.2}
+                        style={isActive ? { filter: 'drop-shadow(0 0 8px #ef4444)' } : undefined } />
+                <text y="26" fontSize="9.5"
+                      fill={isActive ? '#ef4444' : '#c8d4e6'}
+                      textAnchor="middle">{n.label}</text>
+                <text y="36" fontSize="7.5" fill="#7a8aa1" textAnchor="middle">{n.layer}</text>
+              </g>
+            )
+          })}
+        </svg>
+      </div>
+    </Panel>
   )
 }
