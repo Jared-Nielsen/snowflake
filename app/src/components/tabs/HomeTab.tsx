@@ -29,7 +29,7 @@ export function HomeTab() {
     <div className="px-6 pb-12 space-y-12 animate-reveal-up max-w-[1200px] mx-auto">
       {/* ────────── HERO ─────────────────────────────────────────── */}
       <section className="pt-10 pb-8 border-b border-edge-subtle">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-[1.05fr_1fr] gap-10 items-center">
           {/* LEFT · copy + CTA */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -65,12 +65,20 @@ export function HomeTab() {
           </div>
 
           {/* RIGHT · refinery hero image with overlays */}
-          <div className="relative">
+          <div className="relative min-h-[260px]">
             {/* glow halo behind image */}
             <div className="absolute -inset-6 bg-cyan/10 blur-3xl pointer-events-none" />
             <div className="relative border border-edge-subtle bg-bg-base overflow-hidden">
-              {/* Title bar */}
-              <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-center py-2 bg-gradient-to-b from-bg-base/90 via-bg-base/60 to-transparent">
+              <img
+                src="/Refinery.png"
+                alt="Texas Refining · Galveston Bay complex"
+                className="block w-full h-auto"
+              />
+              {/* subtle right-edge fade so the image blends with the page bg */}
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-l from-bg-base/40 to-transparent" />
+
+              {/* Title bar (slim, low opacity so it doesn't cover the skyline) */}
+              <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-center py-1.5 bg-gradient-to-b from-bg-base/70 to-transparent">
                 <div className="flex items-center gap-2">
                   <span className="font-display text-snow text-base font-bold tracking-[0.32em] uppercase">
                     TEXAS
@@ -80,15 +88,6 @@ export function HomeTab() {
                   </span>
                 </div>
               </div>
-
-              <img
-                src="/Refinery.png"
-                alt="Texas Refining · Galveston Bay complex"
-                className="block w-full h-auto object-cover"
-              />
-              {/* gradient blend so the image fades into the page bg at the edges */}
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-bg-base/55 via-transparent to-transparent" />
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-bg-base/65 via-transparent to-transparent" />
 
               {/* corner ticks */}
               <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-cyan" />
