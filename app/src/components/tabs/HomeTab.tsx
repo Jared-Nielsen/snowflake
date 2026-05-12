@@ -34,7 +34,7 @@ export function HomeTab() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="led led-green animate-pulse-soft" />
-              <span className="tag text-snow">LIVE DEMO · TEXAS REFINING · GALVESTON BAY · 280 KBPD</span>
+              <span className="tag text-snow">LIVE DEMO · TEXAS REFINING · LEAGUE CITY · 280 KBPD</span>
             </div>
             <h1 className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-snow">
               One unified data plane.
@@ -71,7 +71,7 @@ export function HomeTab() {
             <div className="relative border border-edge-subtle bg-bg-base overflow-hidden">
               <img
                 src="/Refinery.png"
-                alt="Texas Refining · Galveston Bay complex"
+                alt="Texas Refining · League City complex"
                 className="block w-full h-auto"
               />
               {/* subtle right-edge fade so the image blends with the page bg */}

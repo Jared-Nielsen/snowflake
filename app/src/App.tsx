@@ -13,6 +13,8 @@ import { LogisticsTab } from './components/tabs/LogisticsTab'
 import { CrossTab } from './components/tabs/CrossTab'
 import { DevicesTab } from './components/tabs/DevicesTab'
 import { RefineryTab } from './components/tabs/RefineryTab'
+import { NetworkTab } from './components/tabs/NetworkTab'
+import { CyberSecTab } from './components/tabs/CyberSecTab'
 import { useUiStore } from './store/uiStore'
 import { useStreamStore } from './store/streamStore'
 import type { TabKey } from './types'
@@ -20,6 +22,8 @@ import type { TabKey } from './types'
 const TABS: Record<TabKey, () => JSX.Element> = {
   home: HomeTab,
   refinery: RefineryTab,
+  network: NetworkTab,
+  cybersec: CyberSecTab,
   margin: MarginTab,
   maintenance: MaintenanceTab,
   contract: ContractTab,

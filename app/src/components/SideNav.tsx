@@ -14,6 +14,8 @@ interface TabEntry {
 const TABS: TabEntry[] = [
   { key: 'home',           code: 'HOME',  label: 'Overview',           sub: 'Why Snowflake',     toneActive: 'text-snow',   roi: 'start here' },
   { key: 'refinery',       code: 'PLANT', label: 'Refinery',           sub: 'process train · 13 devices', toneActive: 'text-cyan', roi: '3D + flow' },
+  { key: 'network',        code: 'NET',   label: 'Network',            sub: 'Purdue · L0–L5',       toneActive: 'text-snow',  roi: 'topology' },
+  { key: 'cybersec',       code: 'SEC',   label: 'CyberSec Sim',       sub: '6 attack scenarios',   toneActive: 'text-flare', roi: 'SOC playbook' },
   { key: 'margin',         code: 'TK-01', label: 'Margin & Yield',     sub: 'CDU · Blending',     toneActive: 'text-cyan',   roi: '$6–12M' },
   { key: 'maintenance',    code: 'TK-02', label: 'Predictive Maint.',  sub: 'Reliability · ANOM', toneActive: 'text-amber',  roi: '$4–9M'  },
   { key: 'contract',       code: 'TK-03', label: 'Contract-to-Cash',   sub: 'Quorum · Sirion',    toneActive: 'text-signal', roi: '$1–2M'  },

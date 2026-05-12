@@ -45,7 +45,7 @@ export function CommandBar() {
         <span className="font-cond text-sm font-semibold uppercase tracking-wide">
           Texas Refining
         </span>
-        <Badge tone="copper">Galveston Bay · 280 kbpd</Badge>
+        <Badge tone="copper">League City · 280 kbpd</Badge>
       </div>
 
       <div className="flex-1" />

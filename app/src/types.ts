@@ -1,6 +1,8 @@
 export type TabKey =
   | 'home'
   | 'refinery'
+  | 'network'
+  | 'cybersec'
   | 'margin'
   | 'maintenance'
   | 'contract'
