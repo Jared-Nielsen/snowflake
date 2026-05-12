@@ -69,6 +69,18 @@ export function HomeTab() {
             {/* glow halo behind image */}
             <div className="absolute -inset-6 bg-cyan/10 blur-3xl pointer-events-none" />
             <div className="relative border border-edge-subtle bg-bg-base overflow-hidden">
+              {/* Title bar */}
+              <div className="absolute top-0 inset-x-0 z-10 flex items-center justify-center py-2 bg-gradient-to-b from-bg-base/90 via-bg-base/60 to-transparent">
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-snow text-base font-bold tracking-[0.32em] uppercase">
+                    TEXAS
+                  </span>
+                  <span className="font-cond text-cyan text-sm uppercase tracking-[0.22em] font-semibold">
+                    Refinery
+                  </span>
+                </div>
+              </div>
+
               <img
                 src="/Refinery.png"
                 alt="Texas Refining · Galveston Bay complex"
@@ -84,20 +96,10 @@ export function HomeTab() {
               <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-cyan" />
               <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-cyan" />
 
-              {/* live overlays */}
-              <div className="absolute top-3 left-3 flex items-center gap-2 panel-elev px-2.5 py-1.5">
+              {/* live overlay — Snowpipe status only */}
+              <div className="absolute top-11 left-3 z-10 flex items-center gap-2 panel-elev px-2.5 py-1.5">
                 <span className="led led-green animate-pulse-soft" />
                 <span className="font-cond text-[10px] uppercase tracking-[0.18em] text-snow">Snowpipe · live</span>
-              </div>
-              <div className="absolute top-3 right-3 panel-elev px-2.5 py-1.5">
-                <span className="font-mono text-[10px] text-cyan">280 kbpd · 18:00 UTC</span>
-              </div>
-              <div className="absolute bottom-3 left-3 panel-elev px-2.5 py-1.5">
-                <span className="font-mono text-[10px] text-ink-dim">PLANT TX · UNIT-CD-01 · UNIT-FCC-01</span>
-              </div>
-              <div className="absolute bottom-3 right-3 panel-elev px-2.5 py-1.5 flex items-center gap-1.5">
-                <span className="led led-amber animate-pulse-soft" />
-                <span className="font-mono text-[10px] text-amber">PUMP-401 · 4.81 mm/s</span>
               </div>
             </div>
           </div>
