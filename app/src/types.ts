@@ -1,5 +1,6 @@
 export type TabKey =
   | 'home'
+  | 'refinery'
   | 'margin'
   | 'maintenance'
   | 'contract'
@@ -7,6 +8,7 @@ export type TabKey =
   | 'sustainability'
   | 'logistics'
   | 'cross'
+  | 'devices'
 
 export type SensorKind = 'vibration' | 'temperature' | 'pressure' | 'flow' | 'level'
 

@@ -352,6 +352,7 @@ const TOOLKITS: { key: TabKey; code: string; title: string; body: string; tags: 
   { key: 'sustainability', code: '§6.5', title: 'Sustainability',         body: 'Scope 1/2/3 emissions, methane leak detection, CSRD/IFRS disclosure pipeline.', tags: ['GHG', 'Cortex CV', 'Reporting'] },
   { key: 'logistics',      code: '§6.6', title: 'Logistics',              body: 'Tanker AIS, demand forecast, vehicle routing, berth scheduling, dispatch.',     tags: ['VRP', 'AIS', 'Cortex Forecast'] },
   { key: 'cross',          code: '§6.7', title: 'Cross-Cutting',          body: 'Cortex Analyst NL→SQL, Horizon governance, audit replay, operator copilot.',    tags: ['NL→SQL', 'Horizon', 'Agents'] },
+  { key: 'devices',        code: 'CATALOG', title: 'Device Catalog',     body: '13 canonical refinery device classes with 3D models, live telemetry and process-train workflow.', tags: ['3D · R3F', 'React Flow', 'Live'] },
 ]
 
 const DELTAS = [

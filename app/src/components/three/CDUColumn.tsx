@@ -14,9 +14,9 @@ const COLOR = {
   alarm:   '#ef4444',
   copper:  '#c79a4a',
   flare:   '#ff6b35',
-  steel:   '#1e3049',
-  steelDk: '#132033',
-  steelXd: '#0d1624',
+  steel:   '#4a5d80',
+  steelDk: '#3a4a64',
+  steelXd: '#2a3954',
 } as const
 
 interface Cut {
@@ -179,12 +179,27 @@ function ColumnScene() {
 
 export function CDUColumn() {
   return (
-    <Canvas camera={{ position: [10, 4, 12], fov: 38 }} dpr={[1, 1.6]}>
+    <Canvas camera={{ position: [10, 4, 12], fov: 38 }} dpr={[1, 1.8]}>
       <color attach="background" args={[COLOR.fog]} />
-      <fog attach="fog" args={[COLOR.fog, 14, 32]} />
-      <ambientLight intensity={0.45} />
-      <pointLight position={[8, 10, 6]} intensity={1.1} color={COLOR.amber} />
-      <pointLight position={[-8, 4, -6]} intensity={0.7} color={COLOR.snow} />
+      {/* Fog pushed out so the tall column isn't washed at typical zoom */}
+      <fog attach="fog" args={[COLOR.fog, 28, 90]} />
+
+      {/* Bright ambient + hemisphere for global fill */}
+      <ambientLight intensity={1.35} />
+      <hemisphereLight args={['#e6efff', '#1a2638', 1.0]} />
+
+      {/* Key directional from front-upper-right (daylight white) */}
+      <directionalLight position={[12, 18, 10]} intensity={2.1} color="#ffffff" />
+      {/* Warm fill from rear-left so the column body reads */}
+      <directionalLight position={[-12, 8, -8]} intensity={1.0} color={COLOR.amber} />
+
+      {/* Cool rim from front-left to define silhouette */}
+      <pointLight position={[-8, 4, 10]} intensity={1.2} color={COLOR.cyan} distance={32} decay={2} />
+      {/* Snow fill underglow so the base doesn't go pitch-black */}
+      <pointLight position={[0, -1, 8]}  intensity={1.0} color={COLOR.snow} distance={20} decay={2} />
+      {/* Top accent on the dome */}
+      <pointLight position={[2, 10, 4]}  intensity={1.2} color="#ffffff"   distance={22} decay={2} />
+
       <ColumnScene />
       <OrbitControls
         enablePan

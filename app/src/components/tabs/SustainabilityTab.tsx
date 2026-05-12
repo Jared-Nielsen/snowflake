@@ -155,12 +155,12 @@ export function SustainabilityTab() {
       </div>
 
       {/* 3. Flow + Inspector */}
-      <div className="grid grid-cols-[1fr_360px] gap-4">
-        <Panel>
+      <div className="grid grid-cols-[1fr_360px] gap-4 items-stretch">
+        <Panel className="flex flex-col">
           <PanelHeader label="DATA FLOW · CEMS → GHG ENGINE → ESG DISCLOSURE" hint="click nodes/edges to inspect">
             <Badge tone="cyan">animated · draggable</Badge>
           </PanelHeader>
-          <div className="p-2">
+          <div className="p-2 flex-1 min-h-0">
             <FlowCanvas
               flowKey="sustainability"
               nodes={decorateNodes('sustainability', nodes)}

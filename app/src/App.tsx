@@ -11,12 +11,15 @@ import { TradingTab } from './components/tabs/TradingTab'
 import { SustainabilityTab } from './components/tabs/SustainabilityTab'
 import { LogisticsTab } from './components/tabs/LogisticsTab'
 import { CrossTab } from './components/tabs/CrossTab'
+import { DevicesTab } from './components/tabs/DevicesTab'
+import { RefineryTab } from './components/tabs/RefineryTab'
 import { useUiStore } from './store/uiStore'
 import { useStreamStore } from './store/streamStore'
 import type { TabKey } from './types'
 
 const TABS: Record<TabKey, () => JSX.Element> = {
   home: HomeTab,
+  refinery: RefineryTab,
   margin: MarginTab,
   maintenance: MaintenanceTab,
   contract: ContractTab,
@@ -24,6 +27,7 @@ const TABS: Record<TabKey, () => JSX.Element> = {
   sustainability: SustainabilityTab,
   logistics: LogisticsTab,
   cross: CrossTab,
+  devices: DevicesTab,
 }
 
 export default function App() {

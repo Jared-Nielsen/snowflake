@@ -112,7 +112,10 @@ export function FlowCanvas({
   }
 
   return (
-    <div style={{ height }} className="w-full">
+    // Use minHeight so the canvas grows to fill its parent row when other
+    // panels (e.g. FlowInspector) make the row taller, but never collapses
+    // below the requested baseline.
+    <div style={{ minHeight: height, height: '100%' }} className="w-full">
       <ReactFlow
         nodes={decoratedNodes}
         edges={decoratedEdges}

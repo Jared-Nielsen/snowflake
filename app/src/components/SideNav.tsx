@@ -13,6 +13,7 @@ interface TabEntry {
 
 const TABS: TabEntry[] = [
   { key: 'home',           code: 'HOME',  label: 'Overview',           sub: 'Why Snowflake',     toneActive: 'text-snow',   roi: 'start here' },
+  { key: 'refinery',       code: 'PLANT', label: 'Refinery',           sub: 'process train · 13 devices', toneActive: 'text-cyan', roi: '3D + flow' },
   { key: 'margin',         code: 'TK-01', label: 'Margin & Yield',     sub: 'CDU · Blending',     toneActive: 'text-cyan',   roi: '$6–12M' },
   { key: 'maintenance',    code: 'TK-02', label: 'Predictive Maint.',  sub: 'Reliability · ANOM', toneActive: 'text-amber',  roi: '$4–9M'  },
   { key: 'contract',       code: 'TK-03', label: 'Contract-to-Cash',   sub: 'Quorum · Sirion',    toneActive: 'text-signal', roi: '$1–2M'  },
@@ -20,6 +21,7 @@ const TABS: TabEntry[] = [
   { key: 'sustainability', code: 'TK-05', label: 'Sustainability',     sub: 'Emissions · ESG',    toneActive: 'text-signal', roi: '$0.5–1.5M' },
   { key: 'logistics',      code: 'TK-06', label: 'Logistics',          sub: 'Berths · Tankers',   toneActive: 'text-snow',   roi: '$0.5–1.5M' },
   { key: 'cross',          code: 'TK-07', label: 'Cross-Cutting',      sub: 'Workforce · Audit',  toneActive: 'text-copper', roi: 'platform' },
+  { key: 'devices',        code: 'CATALOG', label: 'Devices',          sub: '13 process devices', toneActive: 'text-cyan',   roi: '3D + telemetry' },
 ]
 
 export function SideNav() {
