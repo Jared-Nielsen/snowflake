@@ -32,6 +32,7 @@ import { FlowInspector } from '@/components/FlowInspector'
 import { useUiStore } from '@/store/uiStore'
 import { useInspectorStore } from '@/store/inspectorStore'
 import { cn } from '@/lib/utils'
+import { autoLayout } from '@/lib/autoLayout'
 import type { NodeInspectorDetails } from '@/store/inspectorStore'
 
 /* ─── device train (process order) ─────────────────────────────── */
@@ -146,16 +147,11 @@ const TRAIN: TrainDevice[] = [
 /* ─── React Flow graph for the train (process order) ─────────────── */
 
 const TRAIN_FLOW: { nodes: Node[]; edges: Edge[] } = (() => {
-  const cols = TRAIN.length
-  const W = 1240
-  const margin = 40
-  const stepX = (W - margin * 2) / (cols - 1)
-  const baseY = 100
-
-  const nodes: Node[] = TRAIN.map((d, i) => ({
+  // Build nodes with placeholder positions — Dagre will reposition them.
+  const nodes: Node[] = TRAIN.map((d) => ({
     id: d.id,
     type: 'schematic',
-    position: { x: margin + i * stepX, y: i % 2 === 0 ? baseY : baseY + 60 },
+    position: { x: 0, y: 0 },
     data: { code: d.code, label: d.label, kind: d.kind, status: 'ok', meta: d.meta, details: d.details },
   }))
 
@@ -190,7 +186,9 @@ const TRAIN_FLOW: { nodes: Node[]; edges: Edge[] } = (() => {
     data: { details: { subsystem: 'RELIEF', contract: 'SPH-LPG-01 PSV × 4 → FLR-1', latency: 'event' } },
   })
 
-  return { nodes, edges }
+  // Run Dagre auto-layout: left-to-right, with gaps that match the
+  // SchematicNode card dimensions.
+  return autoLayout(nodes, edges, { direction: 'LR', nodeSep: 40, rankSep: 110 })
 })()
 
 /* ─── 3D refinery panorama — every device on one baseplate ───────── */
