@@ -29,15 +29,15 @@ const COLOR = {
   copper:     '#c79a4a',
   flare:      '#ff6b35',
   // body / casting tones
-  motorBody:  '#2a3954',
-  motorFin:   '#1a2638',
-  baseplate:  '#0f1828',
-  grout:      '#3a3026',
-  pumpCasing: '#2c3f5a',
-  pumpDark:   '#1b2840',
-  shaftSteel: '#9aa6b5',
-  pipeSteel:  '#4d5d75',
-  flangeRing: '#3a4a64',
+  motorBody:  '#4a5d80',
+  motorFin:   '#2a3954',
+  baseplate:  '#1c2a3e',
+  grout:      '#5a4838',
+  pumpCasing: '#4a5d80',
+  pumpDark:   '#2a3954',
+  shaftSteel: '#c8d4e6',
+  pipeSteel:  '#6d7d95',
+  flangeRing: '#586984',
   gauge:      '#e8edf5',
   nameplate:  '#c79a4a',
   edge:       '#0a1220',
@@ -554,11 +554,25 @@ export function PumpModel() {
   return (
     <Canvas camera={{ position: [5, 3.6, 6.5], fov: 38 }} dpr={[1, 1.8]}>
       <color attach="background" args={[COLOR.fog]} />
-      <fog attach="fog" args={[COLOR.fog, 9, 24]} />
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[6, 9, 7]} intensity={0.9} color={COLOR.amber} />
-      <pointLight position={[-4, 4, -5]} intensity={0.5} color={COLOR.snow} />
-      <pointLight position={[3, 2, 5]}  intensity={0.4} color={COLOR.cyan} />
+      {/* Fog pushed much further out so the model isn't washed out at typical zoom levels */}
+      <fog attach="fog" args={[COLOR.fog, 22, 70]} />
+
+      {/* Strong ambient — every face has baseline illumination */}
+      <ambientLight intensity={1.35} />
+      {/* Hemisphere fill: warm-ish floodlight from above + cool reflected from below */}
+      <hemisphereLight args={['#e6efff', '#1a2638', 1.0]} />
+
+      {/* Key light: bright daylight directional from front-upper-right */}
+      <directionalLight position={[8, 12, 8]} intensity={2.1} color="#ffffff" />
+      {/* Warm fill from rear/left so the motor side reads */}
+      <directionalLight position={[-9, 6, -6]} intensity={1.0} color={COLOR.amber} />
+      {/* Cool rim from front-left to define silhouette */}
+      <pointLight position={[-6, 3, 7]}  intensity={1.4} color={COLOR.cyan} distance={28} decay={2} />
+      {/* Underglow so the baseplate doesn't go pitch-black */}
+      <pointLight position={[0, -1, 5]}  intensity={0.9} color={COLOR.snow}  distance={18} decay={2} />
+      {/* Top accent on the volute/discharge */}
+      <pointLight position={[2, 6, 2]}   intensity={1.2} color="#ffffff"     distance={20} decay={2} />
+
       <PumpAssembly />
       <OrbitControls
         enablePan
