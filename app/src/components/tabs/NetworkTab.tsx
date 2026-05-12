@@ -1599,12 +1599,17 @@ function SnowflakeDeploymentModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-y-0 right-0 left-[228px] z-50 bg-bg-base/95 backdrop-blur-sm flex flex-col p-6 overflow-auto"
+      className="fixed left-[228px] right-0 z-50 flex justify-center pointer-events-none"
+      style={{ top: 'calc(92px + 12px)', bottom: 'calc(36px + 12px)' }}
       role="dialog"
       aria-modal="true"
     >
+      <div
+        className="pointer-events-auto bg-bg-base/95 backdrop-blur-sm border border-edge-subtle shadow-2xl flex flex-col w-full max-w-[1500px] mx-4 overflow-hidden"
+        style={{ height: 'min(90vh, calc(100vh - 92px - 36px - 24px))' }}
+      >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between p-4 border-b border-edge-subtle shrink-0">
         <div className="flex items-center gap-3">
           <div className="relative">
             <SnowflakeIcon className="w-7 h-7 text-snow" strokeWidth={1.5} />
@@ -1614,7 +1619,7 @@ function SnowflakeDeploymentModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="leading-tight">
             <div className="tag text-ink-muted">SNOWFLAKE AI DATA CLOUD · DEPLOYMENT MAP</div>
-            <div className="font-display text-2xl font-bold tracking-tight">All instance types · click any node</div>
+            <div className="font-display text-xl font-bold tracking-tight">All instance types · click any node</div>
           </div>
         </div>
         <button
@@ -1627,9 +1632,9 @@ function SnowflakeDeploymentModal({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* Main grid */}
-      <div className="grid grid-cols-[1fr_400px] gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-[1fr_400px] gap-4 p-4 flex-1 min-h-0 overflow-hidden">
         {/* Groups */}
-        <div className="space-y-4 overflow-y-auto">
+        <div className="space-y-4 overflow-y-auto min-h-0 pr-1">
           {SF_GROUPS.map((g) => (
             <Panel key={g.key}>
               <PanelHeader label={g.title} hint={`${g.instances.length} instances`}>
@@ -1664,11 +1669,11 @@ function SnowflakeDeploymentModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Detail pane */}
-        <Panel className="flex flex-col">
+        <Panel className="flex flex-col min-h-0 overflow-hidden">
           <PanelHeader label="INSTANCE DETAIL" hint={active?.inst.label ?? 'pick a node'}>
             {active && <Badge tone="cyan">{active.inst.id}</Badge>}
           </PanelHeader>
-          <div className="p-4 overflow-y-auto">
+          <div className="p-4 flex-1 min-h-0 overflow-y-auto">
             {!active && (
               <div className="text-ink-muted font-mono text-[11px]">
                 Click any instance tile on the left to see what it does and how it&apos;s deployed.
@@ -1692,6 +1697,7 @@ function SnowflakeDeploymentModal({ onClose }: { onClose: () => void }) {
             )}
           </div>
         </Panel>
+      </div>
       </div>
     </div>
   )
@@ -2174,103 +2180,118 @@ function CharmPanelModal({ onClose, controllerLabel }: { onClose: () => void; co
   }, [onClose])
 
   return (
-    <div className="fixed inset-y-0 right-0 left-[228px] z-50 bg-bg-base/95 backdrop-blur-sm flex flex-col p-6 overflow-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <div className="tag text-ink-muted">CHARM I/O · 96 CHANNELS · FRONT &amp; BACK</div>
-          <div className="font-display text-2xl font-bold tracking-tight">{controllerLabel} · CHARM panel</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="inline-flex border border-edge-subtle">
-            {(['front', 'back'] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFace(f)}
-                className={cn(
-                  'px-3 py-1.5 font-cond text-[11px] uppercase tracking-[0.16em] transition-colors',
-                  face === f ? 'bg-cyan/15 text-cyan' : 'text-ink-muted hover:text-ink',
-                )}
-              >
-                {f}
-              </button>
-            ))}
+    // Bounded box: starts below the global header chrome (CommandBar h-14 + TickerStrip h-9 = 92 px)
+    // and ends above the StatusBar (h-9 = 36 px). Sized to 90vh max with a comfortable cap so
+    // it never extends behind the top header bar regardless of viewport height.
+    <div
+      className="fixed left-[228px] right-0 z-50 flex justify-center pointer-events-none"
+      style={{
+        top: 'calc(92px + 12px)',
+        bottom: 'calc(36px + 12px)',
+      }}
+    >
+      <div className="pointer-events-auto bg-bg-base/95 backdrop-blur-sm border border-edge-subtle shadow-2xl flex flex-col w-full max-w-[1500px] mx-4 overflow-hidden"
+           style={{ height: 'min(90vh, calc(100vh - 92px - 36px - 24px))' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-edge-subtle shrink-0">
+          <div>
+            <div className="tag text-ink-muted">CHARM I/O · 96 CHANNELS · FRONT &amp; BACK</div>
+            <div className="font-display text-xl font-bold tracking-tight">{controllerLabel} · CHARM panel</div>
           </div>
-          <button onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 border border-edge-strong text-ink-dim hover:border-cyan hover:text-cyan transition-colors">
-            <X className="w-4 h-4" />
-            <span className="font-cond text-[11px] uppercase tracking-[0.16em]">close · ESC</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-[1fr_360px] gap-4 flex-1 min-h-0">
-        {/* Cabinet face */}
-        <Panel className="flex flex-col">
-          <PanelHeader label={face === 'front' ? 'FRONT FACE · LED status + tag labels' : 'BACK FACE · field-side terminals + cable run'} hint="click any CHARM" />
-          <div className="p-4 flex-1 min-h-0 overflow-auto">
-            <div className="grid grid-cols-8 gap-1.5">
-              {slots.map((s) => (
+          <div className="flex items-center gap-2">
+            <div className="inline-flex border border-edge-subtle">
+              {(['front', 'back'] as const).map((f) => (
                 <button
-                  key={s.index}
-                  onClick={() => setSelSlot(s)}
+                  key={f}
+                  onClick={() => setFace(f)}
                   className={cn(
-                    'border bg-bg-base/60 p-2 text-left hover:border-cyan transition-colors',
-                    selSlot?.index === s.index ? 'border-cyan' : 'border-edge-subtle',
+                    'px-3 py-1.5 font-cond text-[11px] uppercase tracking-[0.16em] transition-colors',
+                    face === f ? 'bg-cyan/15 text-cyan' : 'text-ink-muted hover:text-ink',
                   )}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[9px] text-ink-muted">CH{(s.index + 1).toString().padStart(2, '0')}</span>
-                    {face === 'front' ? (
-                      <span className={cn('led', s.ioType === 'OPEN' ? 'led-off' : 'led-green animate-pulse-soft')} />
-                    ) : (
-                      <span className="font-mono text-[9px] text-ink-muted">
-                        {s.ioType === 'OPEN' ? '—' : 'TB'}{(s.index + 1).toString().padStart(2,'0')}
-                      </span>
-                    )}
-                  </div>
-                  <div className="font-cond text-[10px] uppercase tracking-wide mt-1" style={{ color: CHARM_TONE[s.ioType] }}>
-                    {s.ioType === 'OPEN' ? 'open' : s.ioType}
-                  </div>
-                  {face === 'front'
-                    ? (
-                      <div className="font-mono text-[10px] text-ink mt-0.5 truncate">
-                        {s.tag ?? '—'}
-                      </div>
-                    )
-                    : (
-                      <div className="font-mono text-[9px] text-ink-dim mt-0.5">
-                        {s.ioType === 'OPEN' ? '—' : `wire: ${(s.index % 12) + 1}A / ${(s.index % 12) + 1}B`}
-                      </div>
-                    )
-                  }
+                  {f}
                 </button>
               ))}
             </div>
+            <button onClick={onClose} className="inline-flex items-center gap-2 px-3 py-2 border border-edge-strong text-ink-dim hover:border-cyan hover:text-cyan transition-colors">
+              <X className="w-4 h-4" />
+              <span className="font-cond text-[11px] uppercase tracking-[0.16em]">close · ESC</span>
+            </button>
           </div>
-        </Panel>
+        </div>
 
-        {/* Channel detail */}
-        <Panel className="flex flex-col">
-          <PanelHeader label="CHANNEL DETAIL" hint={selSlot ? `CH${(selSlot.index + 1).toString().padStart(2,'0')}` : 'pick a CHARM'} />
-          <div className="p-4">
-            {!selSlot && (
-              <div className="font-mono text-[11px] text-ink-muted">
-                Click any CHARM channel on the left to see its I/O type, tag, and field-side terminal wiring.
+        {/* Body */}
+        <div className="grid grid-cols-[1fr_360px] gap-4 p-4 flex-1 min-h-0 overflow-hidden">
+          {/* Cabinet face — scaled to fit */}
+          <Panel className="flex flex-col min-h-0 overflow-hidden">
+            <PanelHeader label={face === 'front' ? 'FRONT FACE · LED status + tag labels' : 'BACK FACE · field-side terminals + cable run'} hint="click any CHARM" />
+            <div className="p-3 flex-1 min-h-0 overflow-auto">
+              <div className="grid grid-cols-8 gap-1.5 auto-rows-fr h-full">
+                {slots.map((s) => (
+                  <button
+                    key={s.index}
+                    onClick={() => setSelSlot(s)}
+                    className={cn(
+                      'border bg-bg-base/60 p-1.5 text-left hover:border-cyan transition-colors',
+                      'flex flex-col justify-between min-h-0',
+                      selSlot?.index === s.index ? 'border-cyan' : 'border-edge-subtle',
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[9px] text-ink-muted">CH{(s.index + 1).toString().padStart(2, '0')}</span>
+                      {face === 'front' ? (
+                        <span className={cn('led', s.ioType === 'OPEN' ? 'led-off' : 'led-green animate-pulse-soft')} />
+                      ) : (
+                        <span className="font-mono text-[9px] text-ink-muted">
+                          {s.ioType === 'OPEN' ? '—' : 'TB'}{(s.index + 1).toString().padStart(2,'0')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="font-cond text-[9.5px] uppercase tracking-wide mt-1" style={{ color: CHARM_TONE[s.ioType] }}>
+                      {s.ioType === 'OPEN' ? 'open' : s.ioType}
+                    </div>
+                    {face === 'front'
+                      ? (
+                        <div className="font-mono text-[9.5px] text-ink mt-0.5 truncate">
+                          {s.tag ?? '—'}
+                        </div>
+                      )
+                      : (
+                        <div className="font-mono text-[9px] text-ink-dim mt-0.5">
+                          {s.ioType === 'OPEN' ? '—' : `wire: ${(s.index % 12) + 1}A / ${(s.index % 12) + 1}B`}
+                        </div>
+                      )
+                    }
+                  </button>
+                ))}
               </div>
-            )}
-            {selSlot && (
-              <div className="space-y-3 font-mono text-[11px]">
-                <DataRow label="channel"      value={`CH${(selSlot.index + 1).toString().padStart(2,'0')}`} tone="cyan" />
-                <DataRow label="I/O type"     value={selSlot.ioType} tone={selSlot.ioType === 'OPEN' ? 'snow' : 'cyan'} />
-                <DataRow label="tag"          value={selSlot.tag ?? '(unassigned)'} />
-                <DataRow label="value"        value={selSlot.value ?? '—'} tone="signal" />
-                <DataRow label="hart status"  value={selSlot.ioType.includes('HART') ? 'good · diagnostics ok' : 'n/a'} tone="signal" />
-                <DataRow label="terminal"     value={selSlot.ioType === 'OPEN' ? '—' : `TB${(selSlot.index + 1).toString().padStart(2,'0')}`} />
-                <DataRow label="wire pair"    value={selSlot.ioType === 'OPEN' ? '—' : `${(selSlot.index % 12) + 1}A / ${(selSlot.index % 12) + 1}B`} />
-                <DataRow label="last cal"     value={selSlot.ioType === 'OPEN' ? '—' : `${Math.floor(Math.random()*120)}d ago`} />
-              </div>
-            )}
-          </div>
-        </Panel>
+            </div>
+          </Panel>
+
+          {/* Channel detail — scrolls independently if it overflows */}
+          <Panel className="flex flex-col min-h-0 overflow-hidden">
+            <PanelHeader label="CHANNEL DETAIL" hint={selSlot ? `CH${(selSlot.index + 1).toString().padStart(2,'0')}` : 'pick a CHARM'} />
+            <div className="p-4 flex-1 min-h-0 overflow-y-auto">
+              {!selSlot && (
+                <div className="font-mono text-[11px] text-ink-muted">
+                  Click any CHARM channel on the left to see its I/O type, tag, and field-side terminal wiring.
+                </div>
+              )}
+              {selSlot && (
+                <div className="space-y-2 font-mono text-[11px]">
+                  <DataRow label="channel"      value={`CH${(selSlot.index + 1).toString().padStart(2,'0')}`} tone="cyan" />
+                  <DataRow label="I/O type"     value={selSlot.ioType} tone={selSlot.ioType === 'OPEN' ? 'snow' : 'cyan'} />
+                  <DataRow label="tag"          value={selSlot.tag ?? '(unassigned)'} />
+                  <DataRow label="value"        value={selSlot.value ?? '—'} tone="signal" />
+                  <DataRow label="hart status"  value={selSlot.ioType.includes('HART') ? 'good · diagnostics ok' : 'n/a'} tone="signal" />
+                  <DataRow label="terminal"     value={selSlot.ioType === 'OPEN' ? '—' : `TB${(selSlot.index + 1).toString().padStart(2,'0')}`} />
+                  <DataRow label="wire pair"    value={selSlot.ioType === 'OPEN' ? '—' : `${(selSlot.index % 12) + 1}A / ${(selSlot.index % 12) + 1}B`} />
+                  <DataRow label="last cal"     value={selSlot.ioType === 'OPEN' ? '—' : `${(selSlot.index * 7) % 120}d ago`} />
+                </div>
+              )}
+            </div>
+          </Panel>
+        </div>
       </div>
     </div>
   )
