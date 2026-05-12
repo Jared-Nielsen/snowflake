@@ -28,36 +28,79 @@ export function HomeTab() {
   return (
     <div className="px-6 pb-12 space-y-12 animate-reveal-up max-w-[1200px] mx-auto">
       {/* ────────── HERO ─────────────────────────────────────────── */}
-      <section className="pt-10 pb-6 border-b border-edge-subtle">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="led led-green animate-pulse-soft" />
-          <span className="tag text-snow">LIVE DEMO · TEXAS REFINING · GALVESTON BAY · 280 KBPD</span>
-        </div>
-        <h1 className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-snow max-w-3xl">
-          One unified data plane.
-          <br />
-          <span className="text-cyan">Five silos, gone.</span>
-        </h1>
-        <p className="mt-6 text-ink-dim text-lg leading-relaxed max-w-2xl font-cond">
-          Cognite, SAP, Quorum, Sirion and Endur arrive in one governed Snowflake
-          AI Data Cloud with zero data movement. Cortex AI turns it into
-          recommendations your operators and traders actually use — every
-          fifteen minutes, not every shift.
-        </p>
-        <div className="flex flex-wrap gap-3 mt-8">
-          <button
-            onClick={() => goTo('margin')}
-            className="group inline-flex items-center gap-2 px-5 py-3 border border-cyan bg-cyan/10 hover:bg-cyan/20 text-cyan font-cond uppercase tracking-[0.16em] text-sm font-semibold transition-colors"
-          >
-            Start the tour
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-          <button
-            onClick={() => goTo('maintenance')}
-            className="inline-flex items-center gap-2 px-5 py-3 border border-edge-strong hover:border-cyan/60 text-ink-dim hover:text-ink font-cond uppercase tracking-[0.16em] text-sm font-semibold transition-colors"
-          >
-            See predictive maintenance
-          </button>
+      <section className="pt-10 pb-8 border-b border-edge-subtle">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 items-center">
+          {/* LEFT · copy + CTA */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="led led-green animate-pulse-soft" />
+              <span className="tag text-snow">LIVE DEMO · TEXAS REFINING · GALVESTON BAY · 280 KBPD</span>
+            </div>
+            <h1 className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-snow">
+              One unified data plane.
+              <br />
+              <span className="text-cyan">Five silos, gone.</span>
+            </h1>
+            <p className="mt-6 text-ink-dim text-lg leading-relaxed font-cond">
+              Cognite, SAP, Quorum, Sirion and Endur arrive in one governed Snowflake
+              AI Data Cloud with zero data movement. Cortex AI turns it into
+              recommendations your operators and traders actually use — every
+              fifteen minutes, not every shift.
+            </p>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <button
+                onClick={() => goTo('margin')}
+                className="group inline-flex items-center gap-2 px-5 py-3 border border-cyan bg-cyan/10 hover:bg-cyan/20 text-cyan font-cond uppercase tracking-[0.16em] text-sm font-semibold transition-colors"
+              >
+                Start the tour
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => goTo('maintenance')}
+                className="inline-flex items-center gap-2 px-5 py-3 border border-edge-strong hover:border-cyan/60 text-ink-dim hover:text-ink font-cond uppercase tracking-[0.16em] text-sm font-semibold transition-colors"
+              >
+                See predictive maintenance
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT · refinery hero image with overlays */}
+          <div className="relative">
+            {/* glow halo behind image */}
+            <div className="absolute -inset-6 bg-cyan/10 blur-3xl pointer-events-none" />
+            <div className="relative border border-edge-subtle bg-bg-base overflow-hidden">
+              <img
+                src="/Refinery.png"
+                alt="Texas Refining · Galveston Bay complex"
+                className="block w-full h-auto object-cover"
+              />
+              {/* gradient blend so the image fades into the page bg at the edges */}
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-bg-base/55 via-transparent to-transparent" />
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-bg-base/65 via-transparent to-transparent" />
+
+              {/* corner ticks */}
+              <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-cyan" />
+              <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-cyan" />
+              <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-cyan" />
+              <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-cyan" />
+
+              {/* live overlays */}
+              <div className="absolute top-3 left-3 flex items-center gap-2 panel-elev px-2.5 py-1.5">
+                <span className="led led-green animate-pulse-soft" />
+                <span className="font-cond text-[10px] uppercase tracking-[0.18em] text-snow">Snowpipe · live</span>
+              </div>
+              <div className="absolute top-3 right-3 panel-elev px-2.5 py-1.5">
+                <span className="font-mono text-[10px] text-cyan">280 kbpd · 18:00 UTC</span>
+              </div>
+              <div className="absolute bottom-3 left-3 panel-elev px-2.5 py-1.5">
+                <span className="font-mono text-[10px] text-ink-dim">PLANT TX · UNIT-CD-01 · UNIT-FCC-01</span>
+              </div>
+              <div className="absolute bottom-3 right-3 panel-elev px-2.5 py-1.5 flex items-center gap-1.5">
+                <span className="led led-amber animate-pulse-soft" />
+                <span className="font-mono text-[10px] text-amber">PUMP-401 · 4.81 mm/s</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
