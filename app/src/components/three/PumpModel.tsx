@@ -536,15 +536,67 @@ function PumpAssembly() {
         </Text>
       </group>
 
-      {/* ─── Labels ─── */}
-      <Text position={[motorCenterX, 1.7, 0]} fontSize={0.18} color={COLOR.snow} anchorX="center">
+      {/* ─── Floating labels — always rendered on top of the geometry ─── */}
+      <FloatingLabel position={[motorCenterX, 2.45, 0]} color={COLOR.snow}>
         MOTOR · 250 HP · 4 kV · TEFC
-      </Text>
-      <Text position={[voluteX + 0.6, 1.7, 0]} fontSize={0.18} color={sevColor} anchorX="center">
+      </FloatingLabel>
+      <FloatingLabel position={[voluteX + 0.6, 2.45, 0]} color={sevColor}>
         {`VIB ${vib.toFixed(2)} mm/s · ${sev}`}
-      </Text>
-      <Text position={[voluteX, -1.85, 0]} fontSize={0.13} color={COLOR.snow} anchorX="center">
+      </FloatingLabel>
+      <FloatingLabel position={[voluteX, -2.2, 0]} color={COLOR.snow} fontSize={0.16}>
         API-610 OH2 · ANSI B73.1 · 1740 RPM
+      </FloatingLabel>
+    </group>
+  )
+}
+
+/**
+ * FloatingLabel — drei <Text> that always renders on top of the geometry
+ * (depthTest = false, depthWrite = false, high renderOrder), with a
+ * billboard-style faux backing plate so the text stays legible regardless
+ * of camera angle.
+ */
+function FloatingLabel({
+  position,
+  color,
+  fontSize = 0.22,
+  children,
+}: {
+  position: [number, number, number]
+  color: string
+  fontSize?: number
+  children: React.ReactNode
+}) {
+  return (
+    <group position={position} renderOrder={999}>
+      <Text
+        fontSize={fontSize}
+        color={color}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={fontSize * 0.16}
+        outlineColor="#080e18"
+        outlineOpacity={0.95}
+        renderOrder={999}
+        onUpdate={(self: THREE.Object3D) => {
+          // Walk the drei text's children and set their materials to
+          // depthTest=false so the text draws over any geometry behind it.
+          self.traverse((child) => {
+            const mesh = child as THREE.Mesh
+            const mat = mesh.material as THREE.Material | THREE.Material[] | undefined
+            if (!mat) return
+            const apply = (m: THREE.Material) => {
+              m.depthTest = false
+              m.depthWrite = false
+              m.transparent = true
+              m.needsUpdate = true
+            }
+            Array.isArray(mat) ? mat.forEach(apply) : apply(mat)
+            mesh.renderOrder = 999
+          })
+        }}
+      >
+        {children}
       </Text>
     </group>
   )
