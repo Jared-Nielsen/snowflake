@@ -7,6 +7,16 @@ import { FlowInspector } from '@/components/FlowInspector'
 import { QueryPanel } from '@/components/QueryPanel'
 import { StreamChart } from '@/components/StreamChart'
 import { PumpModel } from '@/components/three/PumpModel'
+import {
+  PumpPerformanceCurves,
+  SystemCurveOverlay,
+  PumpPID,
+  PumpCrossSection,
+  VibrationAnalysisDeck,
+  PVIndicatorDiagram,
+  HydraulicSchematic,
+  KValueTable,
+} from '@/components/diagrams/PumpDiagrams'
 import { Tex } from '@/lib/katex'
 import { formatUSD, formatUSDk, pct } from '@/lib/utils'
 import { decorateNodes, decorateEdges } from '@/lib/flowDetails'
@@ -189,7 +199,133 @@ export function MaintenanceTab() {
       </div>
 
       <SubToolkitDeck />
+
+      <EngineeringDiagramsDeck />
     </div>
+  )
+}
+
+/* ─── PUMP-401 · canonical engineering diagrams ──────────────────── */
+
+function EngineeringDiagramsDeck() {
+  return (
+    <>
+      <div className="flex items-end justify-between mt-4">
+        <div>
+          <div className="tag text-snow">ENGINEERING DIAGRAMS · PUMP-401</div>
+          <div className="font-cond text-[12px] text-ink-dim mt-0.5">
+            8 canonical diagrams used by reliability engineers · sized, contextualized, instrumented and feature-store backed
+          </div>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Badge tone="cyan">H-Q + SYSTEM</Badge>
+          <Badge tone="snow">P&amp;ID</Badge>
+          <Badge tone="copper">CUTAWAY</Badge>
+          <Badge tone="flare">VIBRATION</Badge>
+        </div>
+      </div>
+
+      {/* Row 1 — performance + system curves */}
+      <div className="grid grid-cols-2 gap-4">
+        <Panel>
+          <PanelHeader label="01 · PUMP PERFORMANCE CURVES · H-Q · η · BHP · NPSHr" hint="manufacturer · API 610">
+            <Badge tone="cyan">H-Q</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <PumpPerformanceCurves operatingFlowGpm={1450} />
+            <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+              Four overlaid curves — head, efficiency (peaks at BEP), brake horsepower and NPSHr — all referenced against the live operating point. Used for sizing, BEP checks and cavitation margin.
+            </div>
+          </div>
+        </Panel>
+
+        <Panel>
+          <PanelHeader label="02 · SYSTEM CURVE × PUMP CURVE · operating point" hint="Bernoulli + minor losses">
+            <Badge tone="signal">overlay</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <SystemCurveOverlay operatingFlowGpm={1450} />
+            <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+              System curve <Tex tex={String.raw`H_{sys} = H_{static} + K \cdot Q^{2}`} /> intersects the pump curve at the actual operating point. Throttle valve closing raises K; VFD speed changes shift the pump curve.
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      {/* Row 2 — P&ID + cross-section */}
+      <div className="grid grid-cols-2 gap-4">
+        <Panel>
+          <PanelHeader label="03 · P&ID · ISA-5.1 PROCESS &amp; INSTRUMENTATION" hint="control + safety">
+            <Badge tone="snow">P&amp;ID</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <PumpPID />
+            <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+              The pump in full process context: gate + check valves, pressure transmitters PT-101/102, flow loop FIC-101 · FV-101, PSV-101 relief and the VT-401 vibration tag feeding Cortex anomaly.
+            </div>
+          </div>
+        </Panel>
+
+        <Panel>
+          <PanelHeader label="04 · MECHANICAL CROSS-SECTION · GA DRAWING" hint="API-610 OH2">
+            <Badge tone="copper">cutaway</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <PumpCrossSection />
+            <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+              Internal mechanical layout: TEFC motor, coupling, DE/NDE bearings, mechanical seal, impeller with wear ring, single-stage volute, suction and discharge nozzles with flanges.
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      {/* Row 3 — vibration analysis */}
+      <Panel>
+        <PanelHeader label="05 · VIBRATION ANALYSIS · FFT · ORBIT · BODE · WATERFALL · CENTERLINE" hint="live · PUMP-401 stream">
+          <Badge tone="flare">condition monitoring</Badge>
+          <Badge tone="cyan">live</Badge>
+        </PanelHeader>
+        <div className="p-3">
+          <VibrationAnalysisDeck />
+          <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+            FFT shows the 1× / 2× harmonic content (1× peak amplifies in alarm) · orbit traces shaft motion at the DE proximity probes · Bode amplitude vs RPM identifies critical speeds · waterfall shows spectrum drift across the last six samples · shaft centerline plot tracks bearing-clearance drift.
+          </div>
+        </div>
+      </Panel>
+
+      {/* Row 4 — P-V + hydraulic schematic */}
+      <div className="grid grid-cols-2 gap-4">
+        <Panel>
+          <PanelHeader label="06 · P-V INDICATOR DIAGRAM · representative" hint="reciprocating cycle">
+            <Badge tone="amber">N/A · centrifugal</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <PVIndicatorDiagram />
+          </div>
+        </Panel>
+        <Panel>
+          <PanelHeader label="07 · HYDRAULIC + ELECTRICAL SCHEMATIC" hint="ISO 1219 + single-line">
+            <Badge tone="snow">schematic</Badge>
+          </PanelHeader>
+          <div className="p-3">
+            <HydraulicSchematic />
+            <div className="mt-2 font-mono text-[10px] text-ink-muted leading-relaxed">
+              Source tank → strainer → centrifugal pump symbol → check valve → throttle → CDU-100 destination. VFD-driven 4 kV 3φ motor controls speed.
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      {/* Row 5 — K-value table */}
+      <Panel>
+        <PanelHeader label="08 · K-VALUE COEFFICIENTS · CRANE TP-410 · feeds the system curve" hint="Cognite PI AF attributes">
+          <Badge tone="cyan">static · ingest once</Badge>
+        </PanelHeader>
+        <div className="p-4">
+          <KValueTable />
+        </div>
+      </Panel>
+    </>
   )
 }
 

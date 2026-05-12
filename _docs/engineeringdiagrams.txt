@@ -1,0 +1,73 @@
+The main engineering diagrams used to analyze pumps (centrifugal and reciprocating) focus on hydraulic performance, system integration, mechanical design, and condition monitoring. These are standard in process plants, oil & gas, water treatment, and chemical facilities — and they tie directly into tools like Cognite (for contextualized data) and Fabric (for analytics/ML).Here’s the definitive list:1. Pump Performance Curves (H-Q Curves) – The #1 diagram for analysisThese are manufacturer-provided multi-plot graphs showing how the pump behaves.H-Q curve (Head vs. Flow): Main curve showing developed head drops as flow increases.
+Efficiency curve: Peaks at the Best Efficiency Point (BEP).
+Power (BHP/kW) curve.
+NPSHr curve (Net Positive Suction Head Required).
+
+Why used: Sizing, operating point prediction, efficiency checks, cavitation risk.rotechpumps.com
+
+hardhatengineer.com
+
+linkedin.com
+
+2. System Curve (and Pump + System Overlay) – Critical for operating pointPlots the total dynamic head the piping system requires vs. flow (static head + friction losses).Overlay with the pump curve shows the actual operating point.
+Used for throttling, VFD speed changes, parallel/series operation.
+
+Key tie-in: Built using K-value coefficients (see below).datatool.pumps.org
+
+datatool.pumps.org
+
+3. P&ID (Piping and Instrumentation Diagram)Shows the pump in the full process context with valves, instruments (pressure, flow, level), controls, and safety devices.Why used: Process design, troubleshooting, control strategy, and integration with PI AF/Cognite.enggcyclopedia.com
+
+rishabheng.com
+
+4. Cross-Sectional / Cutaway Diagrams (Mechanical GA Drawings)Internal view of impeller, volute, wear rings, shaft, bearings, seals, etc.Why used: Maintenance planning, failure analysis, spare parts identification.hardhatengineer.com
+
+hardhatengineer.com
+
+5. Additional specialized diagrams (used when needed)Diagram
+Purpose
+Typical Pump Type
+Vibration analysis plots (FFT spectrum, orbit, Bode, waterfall, shaft centerline)
+Condition monitoring, bearing/alignment issues
+Centrifugal (ties to your compressor vibration work)
+P-V Indicator Diagram
+Pressure-volume cycle, valve performance
+Reciprocating pumps
+Hydraulic schematics
+Flow paths, pump/motor symbols
+Any (especially in control systems)
+
+Detailed information on K-value coefficients (for pumps)In pump engineering, K-value (also called resistance coefficient, minor loss coefficient, or K-factor) is the dimensionless number used to calculate localized pressure/head losses through fittings, valves, entrances, exits, bends, tees, reducers, etc.Formula (Darcy-Weisbach minor loss):
+hf=K×v22gh_f = K \times \frac{v^2}{2g}h_f = K \times \frac{v^2}{2g}
+hfh_fh_f
+ = head loss (ft or m)
+(v) = fluid velocity in the pipe (ft/s or m/s)
+(g) = gravity (32.2 ft/s² or 9.81 m/s²)
+
+These K-values are added to the friction losses (from pipe roughness) to build the system curve above.Key facts about K-value coefficientsStatic or very slowly changing → exactly the type of data you ingest once (or on change) into Cognite/PI AF as attributes on piping elements or in a Raw table/Data Model.
+Values come from standardized tables (Crane TP-410, Idelchik Handbook, manufacturer data). They depend on:Fitting type and geometry (e.g., 90° elbow K ≈ 0.3–0.9)
+Pipe size (sometimes Reynolds-number dependent)
+Entrance/exit conditions
+
+Example typical K-values (approximate):Fitting/Valve
+Typical K-value
+Gate valve (full open)
+0.19
+Globe valve (full open)
+10.0
+90° standard elbow
+0.9
+90° long-radius elbow
+0.45
+Tee (flow through run)
+0.4
+Sharp-edged entrance
+0.5
+Flush exit
+1.0
+
+Used in system curve calculations, pump sizing software, and digital twins in Cognite/Fabric.
+In your stack: Store K-values in PI AF attributes (linked to pipe segments) → Cognite PI AF extractor pulls them → Fabric Lakehouse uses them with real-time flow/pressure data to compute expected vs. actual head or detect fouling/leaks.
+
+Note on possible confusion: This is not the thermodynamic VLE K-value (y/x) you may have used earlier for compressors/process simulation. In pumps (liquid service) it is almost always the hydraulic loss coefficient.These diagrams + K-coefficient data are the foundation for everything from basic sizing to predictive maintenance in Cognite + Fabric.
+
